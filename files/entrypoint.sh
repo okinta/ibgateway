@@ -27,13 +27,7 @@ Xvfb :99 -screen 0 640x480x8 -nolisten tcp -nolisten unix &
 export DISPLAY=:99
 
 if [ "$1" = "gateway" ]; then
-    /opt/ibc/gatewaystart.sh
-
-    port=4001
-    if [ "$MODE" = paper ]; then
-        port=4002
-    fi
-    wait-for-it 127.0.0.1:$port -t 10 -s -- echo "Gateway is running"
+    exec /opt/ibc/gatewaystart.sh -inline
 
 else
     exec "$@"

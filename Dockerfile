@@ -58,5 +58,6 @@ RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/sta
 
 USER ibgateway
 COPY files /home/ibgateway
+COPY displaybannerandlaunch.sh /opt/ibc/scripts
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/home/ibgateway/entrypoint.sh"]
 CMD ["gateway"]
