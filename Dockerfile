@@ -20,13 +20,6 @@ RUN wget -q https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tin
     && mkdir -p /deps/usr/local/bin \
     && mv tini-amd64 /deps/usr/local/bin/tini
 
-# Grab wait-for-it script so we know when gateway is ready
-ARG WAIT_FOR_IT_VERSION=c096cface5fbd9f2d6b037391dfecae6fde1362e
-RUN wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/$WAIT_FOR_IT_VERSION/wait-for-it.sh \
-    && chmod o+x wait-for-it.sh \
-    && mkdir -p /deps/usr/local/bin \
-    && mv wait-for-it.sh /deps/usr/local/bin/wait-for-it
-
 # Install IBC
 ARG IBC_VERSION=3.8.2
 RUN wget -q https://github.com/IbcAlpha/IBC/releases/download/$IBC_VERSION/IBCLinux-$IBC_VERSION.zip \

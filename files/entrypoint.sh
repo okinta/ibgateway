@@ -17,7 +17,7 @@ fi
 
 if [[ ! "$MODE" =~ ^(live|paper)$ ]]; then
     echo "MODE environment variable must be set to either live or paper" >&2
-    exit
+    exit 1
 fi
 
 envsubst < ~/ibc/config.ini.template > ~/ibc/config.ini
