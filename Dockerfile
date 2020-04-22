@@ -1,6 +1,18 @@
 ARG UBUNTU_VERSION=18.04
 FROM ubuntu:$UBUNTU_VERSION
+
+# Install gettext for envsubst
 RUN apt-get update && apt-get install -y gettext-base
+
+# Install tini
+ARG TINI_VERSION=0.19.0
+ADD https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini-amd64 \
+    /usr/local/bin/tini
+RUN chmod +x /usr/local/bin/tini
+
+# Keep file structure for dependencies so that we can easily copy them
+RUN mkdir -p /deps/usr/bin && cp /usr/bin/envsubst /deps/usr/bin/envsubst \
+    && mkdir -p /deps/usr/local/bin && cp /usr/local/bin/tini /deps/usr/local/bin/tini
 
 FROM ubuntu:$UBUNTU_VERSION
 
@@ -34,7 +46,7 @@ RUN apt-get update && apt-get install -y unzip wget \
 # Install dependencies
 RUN apt-get update && apt-get install -y xterm \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=0 /usr/bin/envsubst /usr/bin/envsubst
+COPY --from=0 /deps /
 
 # Create a new user to run IB Gateway under
 ARG IBUSER=ibgateway
@@ -43,5 +55,5 @@ RUN useradd ibgateway \
     && chown -R ibgateway:ibgateway /home/ibgateway
 
 USER ibgateway
-ENTRYPOINT ["/home/ibgateway/entrypoint.sh"]
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/home/ibgateway/entrypoint.sh"]
 CMD ["gateway"]
