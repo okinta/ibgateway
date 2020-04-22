@@ -4,7 +4,7 @@ RUN apt-get update && apt-get install -y gettext-base
 
 FROM ubuntu:$UBUNTU_VERSION
 
-# Install TWS Gateway
+# Install IB Gateway
 RUN apt-get update && apt-get install -y wget \
     && wget -q https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh \
     && chmod +x ibgateway-stable-standalone-linux-x64.sh \

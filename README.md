@@ -1,12 +1,12 @@
 # README
 
-Runs Interactive Brokers (IB) TWS gateway.
+Runs Interactive Brokers (IB) gateway.
 
 ## Building
 
 To build the container:
 
-    docker build -t okinta/stack-ibtwsgateway .
+    docker build -t okinta/stack-ibgateway .
 
 ## Running
 
@@ -19,4 +19,4 @@ If `MODE` is not set, it will default to `paper`. `MODE` must be set to either
 `live` or `paper`. `paper` indicates IB paper trading mode, and `live`
 indicates trading with real money.
 
-    docker run -e "LOGIN=[login]" -e "PASSWORD=[password]" -e MODE=paper -v logs:/root/ibc/logs okinta/stack-ibtwsgateway
+    docker run -e "LOGIN=[login]" -e "PASSWORD=[password]" -e MODE=paper -v logs:/root/ibc/logs okinta/stack-ibgateway
