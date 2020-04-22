@@ -46,6 +46,7 @@ RUN apt-get update && apt-get install -y wget \
 
 # Install dependencies
 RUN apt-get update \
+    && apt-get install --no-install-recommends -y xfonts-base \
     && apt-get install --no-install-recommends -y xterm \
     && apt-get install --no-install-recommends -y xvfb \
     && rm -rf /var/lib/apt/lists/*
