@@ -56,6 +56,10 @@ RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/sta
     && su ibgateway -c 'yes n | ./ibgateway-stable-standalone-linux-x64.sh' \
     && rm -f ibgateway-stable-standalone-linux-x64.sh
 
+RUN apt-get update
+RUN apt-get install --no-install-recommends -y libxtst6
+RUN apt-get install --no-install-recommends -y libxi6
+
 USER ibgateway
 COPY files /home/ibgateway
 COPY displaybannerandlaunch.sh /opt/ibc/scripts
