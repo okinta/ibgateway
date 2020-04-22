@@ -22,18 +22,26 @@ RUN apt-get update && apt-get install -y unzip wget \
     && apt-get remove -y --purge unzip wget \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
-COPY config.ini /root/ibc/config.ini.template
-RUN mkdir /root/ibc/logs
 
 # Grab wait-for-it script so we know when gateway is ready
 RUN apt-get update && apt-get install -y unzip wget \
-    && wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/c096cface5fbd9f2d6b037391dfecae6fde1362e/wait-for-it.sh -O /wait-for-it.sh \
-    && chmod +x /wait-for-it.sh \
+    && wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/c096cface5fbd9f2d6b037391dfecae6fde1362e/wait-for-it.sh -O /usr/local/bin/wait-for-it \
+    && chmod +x /usr/local/bin/wait-for-it \
     && apt-get remove -y --purge wget \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
 
+# Install dependencies
+RUN apt-get update && apt-get install -y xterm \
+    && rm -rf /var/lib/apt/lists/*
 COPY --from=0 /usr/bin/envsubst /usr/bin/envsubst
-COPY entrypoint.sh /entrypoint.sh
-ENTRYPOINT ["/entrypoint.sh"]
+
+# Create a new user to run IB Gateway under
+ARG IBUSER=ibgateway
+COPY files /home/$IBUSER
+RUN useradd $IBUSER \
+    && chown -R $IBUSER:$IBUSER /home/$IBUSER
+
+USER $IBUSER
+ENTRYPOINT ["/home/$IBUSER/entrypoint.sh"]
 CMD ["gateway"]
