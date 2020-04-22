@@ -54,7 +54,6 @@ RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/sta
     && rm -f ibgateway-stable-standalone-linux-x64.sh
 
 USER ibgateway
-COPY files /home/ibgateway
-COPY displaybannerandlaunch.sh /opt/ibc/scripts
-ENTRYPOINT ["/usr/local/bin/tini", "--", "/home/ibgateway/entrypoint.sh"]
+COPY files /
+ENTRYPOINT ["/usr/local/bin/tini", "--", "/entrypoint.sh"]
 CMD ["gateway"]
