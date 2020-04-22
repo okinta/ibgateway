@@ -1,4 +1,8 @@
-FROM ubuntu:18.04
+ARG UBUNTU_VERSION=18.04
+FROM ubuntu:$UBUNTU_VERSION
+RUN apt-get update && apt-get install -y gettext-base
+
+FROM ubuntu:$UBUNTU_VERSION
 
 # Install TWS Gateway
 RUN apt-get update && apt-get install -y wget \
@@ -20,6 +24,7 @@ RUN apt-get update && apt-get install -y unzip wget \
     && rm -rf /var/lib/apt/lists/*
 COPY config.ini /root/config.ini.template
 
+COPY --from=0 /usr/bin/envsubst /usr/bin/envsubst
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["/opt/ibc/gatewaystart.sh"]
