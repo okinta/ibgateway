@@ -1,63 +1,61 @@
 ARG UBUNTU_VERSION=18.04
 FROM ubuntu:$UBUNTU_VERSION
 
-# Install wget so we can download dependencies
+# Install tools to install other tools
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y ca-certificates wget
+    && apt-get install --no-install-recommends -y \
+    ca-certificates \
+    unzip \
+    wget
 
 # Install gettext for envsubst
-RUN apt-get install --no-install-recommends -y gettext-base
+RUN apt-get install --no-install-recommends -y gettext-base \
+    && mkdir -p /deps/usr/bin \
+    && cp /usr/bin/envsubst /deps/usr/bin
 
-# Install tini
+# Install tini just for some extra safety in case there are any zombies
 ARG TINI_VERSION=0.19.0
-RUN wget -q https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini-amd64 \
-    -O /usr/local/bin/tini
+RUN mkdir -p /deps/usr/local/bin \
+    && wget -q -o /deps/usr/local/bin/tini \
+    https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini-amd64 \
+    && chmod o+x /deps/usr/local/bin/tini
 
-# Keep file structure for dependencies so that we can easily copy them
-RUN mkdir -p /deps/usr/bin && cp /usr/bin/envsubst /deps/usr/bin/envsubst \
-    && mkdir -p /deps/usr/local/bin && cp /usr/local/bin/tini /deps/usr/local/bin/tini
+# Grab wait-for-it script so we know when gateway is ready
+ARG WAIT_FOR_IT_VERSION=c096cface5fbd9f2d6b037391dfecae6fde1362e
+RUN wget -q -o /deps/usr/local/bin/wait-for-it \
+    https://raw.githubusercontent.com/vishnubob/wait-for-it/$WAIT_FOR_IT_VERSION/wait-for-it.sh \
+    && chmod o+x /deps/usr/local/bin/wait-for-it
+
+# Install IBC
+ARG IBC_VERSION=3.8.2
+RUN wget -q https://github.com/IbcAlpha/IBC/releases/download/$IBC_VERSION/IBCLinux-$IBC_VERSION.zip \
+    && mkdir -p /deps/opt \
+    && unzip IBCLinux-$IBC_VERSION.zip -d /deps/opt/ibc \
+    && chmod o+x /deps/opt/ibc/*.sh /deps/opt/ibc/*/*.sh
+
+# Install curl so we can download dependencies that we don't add here
+COPY --from=okinta/curl-static:ubuntu /curl /deps
 
 FROM ubuntu:$UBUNTU_VERSION
 
 # Create a new user to run IB Gateway under
 RUN useradd --create-home ibgateway
 
+# Pull in what we need from the builder container
+COPY --from=0 /deps /
+
 # Install IB Gateway
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y ca-certificates wget \
-    && wget -q https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh \
+RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh \
     && chmod o+x ibgateway-stable-standalone-linux-x64.sh
 USER ibgateway
 RUN yes n | ./ibgateway-stable-standalone-linux-x64.sh
 USER root
-RUN rm -f ibgateway-stable-standalone-linux-x64.sh \
-    && apt-get --purge autoremove -y ca-certificates wget \
-    && rm -rf /var/lib/apt/lists/*
-
-# Install IBC
-ARG IBC_VERSION=3.8.2
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y ca-certificates unzip wget \
-    && wget -q https://github.com/IbcAlpha/IBC/releases/download/$IBC_VERSION/IBCLinux-$IBC_VERSION.zip \
-    && unzip IBCLinux-$IBC_VERSION.zip -d /opt/ibc \
-    && chmod o+x /opt/ibc/*.sh /opt/ibc/*/*.sh \
-    && rm -f IBCLinux-$IBC_VERSION.zip \
-    && apt-get --purge autoremove -y ca-certificates unzip wget \
-    && rm -rf /var/lib/apt/lists/*
-
-# Grab wait-for-it script so we know when gateway is ready
-RUN apt-get update \
-    && apt-get install --no-install-recommends -y ca-certificates wget \
-    && wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/c096cface5fbd9f2d6b037391dfecae6fde1362e/wait-for-it.sh -O /usr/local/bin/wait-for-it \
-    && chmod +x /usr/local/bin/wait-for-it \
-    && apt-get --purge autoremove -y ca-certificates wget \
-    && rm -rf /var/lib/apt/lists/*
+RUN rm -f ibgateway-stable-standalone-linux-x64.sh
 
 # Install dependencies
 RUN apt-get update \
     && apt-get install --no-install-recommends -y xfonts-base xterm xvfb \
     && rm -rf /var/lib/apt/lists/*
-COPY --from=0 /deps /
 
 USER ibgateway
 COPY files /home/ibgateway
