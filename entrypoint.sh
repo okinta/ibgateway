@@ -23,9 +23,13 @@ fi
 envsubst < /root/ibc/config.ini.template > /root/ibc/config.ini
 
 if [ $@ = "gateway" ]; then
-    exec /opt/ibc/gatewaystart.sh
+    /opt/ibc/gatewaystart.sh
 
-    # TODO: wait
+    port=4001
+    if [ "$MODE" = paper ]; then
+        port=4002
+    fi
+    /wait-for-it.sh 127.0.0.1:$port -t 30 -s -- echo "Gateway is running"
 
 else
     exec "$@"
