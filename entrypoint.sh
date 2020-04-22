@@ -15,7 +15,7 @@ if [ -z "$MODE" ]; then
     export MODE
 fi
 
-if [ ! "$MODE" =~ ^(live|paper)$ ]; then
+if [[ ! "$MODE" =~ ^(live|paper)$ ]]; then
     echo "MODE environment variable must be set to either live or paper" >&2
     exit
 fi
