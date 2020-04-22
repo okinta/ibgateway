@@ -41,7 +41,11 @@ FROM ubuntu:$UBUNTU_VERSION
 
 # Install dependencies
 RUN apt-get update \
-    && apt-get install --no-install-recommends -y xfonts-base xterm xvfb \
+    && apt-get install --no-install-recommends -y \
+    libxi6 \
+    libxrender1 \
+    libxtst6 \
+    xvfb \
     && rm -rf /var/lib/apt/lists/*
 
 # Create a new user to run IB Gateway under
@@ -55,12 +59,6 @@ RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/sta
     && chmod o+x ibgateway-stable-standalone-linux-x64.sh \
     && su ibgateway -c 'yes n | ./ibgateway-stable-standalone-linux-x64.sh' \
     && rm -f ibgateway-stable-standalone-linux-x64.sh
-
-RUN apt-get update
-RUN apt-get install --no-install-recommends -y libxtst6
-RUN apt-get install --no-install-recommends -y libxi6
-RUN apt-get remove -y xterm
-RUN apt-get remove -y xfonts-base
 
 USER ibgateway
 COPY files /home/ibgateway
