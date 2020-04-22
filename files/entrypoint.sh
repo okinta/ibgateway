@@ -22,7 +22,7 @@ fi
 
 envsubst < ~/ibc/config.ini.template > ~/ibc/config.ini
 
-if [ $@ = "gateway" ]; then
+if [ "$@" = "gateway" ]; then
     /opt/ibc/gatewaystart.sh
 
     port=4001

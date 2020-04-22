@@ -38,10 +38,10 @@ COPY --from=0 /usr/bin/envsubst /usr/bin/envsubst
 
 # Create a new user to run IB Gateway under
 ARG IBUSER=ibgateway
-COPY files /home/$IBUSER
-RUN useradd $IBUSER \
-    && chown -R $IBUSER:$IBUSER /home/$IBUSER
+COPY files /home/ibgateway
+RUN useradd ibgateway \
+    && chown -R ibgateway:ibgateway /home/ibgateway
 
-USER $IBUSER
-ENTRYPOINT ["/home/$IBUSER/entrypoint.sh"]
+USER ibgateway
+ENTRYPOINT ["/home/ibgateway/entrypoint.sh"]
 CMD ["gateway"]
