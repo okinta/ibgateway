@@ -46,11 +46,9 @@ COPY --from=0 /deps /
 
 # Install IB Gateway
 RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh \
-    && chmod o+x ibgateway-stable-standalone-linux-x64.sh
-USER ibgateway
-RUN yes n | ./ibgateway-stable-standalone-linux-x64.sh
-USER root
-RUN rm -f ibgateway-stable-standalone-linux-x64.sh
+    && chmod o+x ibgateway-stable-standalone-linux-x64.sh \
+    && su ibgateway -c 'yes n | ./ibgateway-stable-standalone-linux-x64.sh' \
+    && rm -f ibgateway-stable-standalone-linux-x64.sh
 
 # Install dependencies
 RUN apt-get update \
