@@ -5,10 +5,11 @@ FROM ubuntu:$UBUNTU_VERSION
 RUN apt-get update && apt-get install -y gettext-base
 
 # Install tini
+RUN apt-get install -y wget
 ARG TINI_VERSION=0.19.0
-ADD https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini-amd64 \
-    /usr/local/bin/tini
-RUN chmod +x /usr/local/bin/tini
+RUN wget -q https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini-amd64 \
+    -O /usr/local/bin/tini \
+    && chmod +x /usr/local/bin/tini
 
 # Keep file structure for dependencies so that we can easily copy them
 RUN mkdir -p /deps/usr/bin && cp /usr/bin/envsubst /deps/usr/bin/envsubst \
@@ -36,7 +37,7 @@ RUN apt-get update && apt-get install -y unzip wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Grab wait-for-it script so we know when gateway is ready
-RUN apt-get update && apt-get install -y unzip wget \
+RUN apt-get update && apt-get install -y wget \
     && wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/c096cface5fbd9f2d6b037391dfecae6fde1362e/wait-for-it.sh -O /usr/local/bin/wait-for-it \
     && chmod +x /usr/local/bin/wait-for-it \
     && apt-get remove -y --purge wget \
@@ -44,7 +45,9 @@ RUN apt-get update && apt-get install -y unzip wget \
     && rm -rf /var/lib/apt/lists/*
 
 # Install dependencies
-RUN apt-get update && apt-get install -y xterm \
+RUN apt-get update \
+    && apt-get install --no-install-recommends -y xterm \
+    && apt-get install --no-install-recommends -y xvfb \
     && rm -rf /var/lib/apt/lists/*
 COPY --from=0 /deps /
 
