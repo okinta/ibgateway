@@ -20,6 +20,13 @@ if [[ ! "$MODE" =~ ^(live|paper)$ ]]; then
     exit
 fi
 
-envsubst < /root/config.ini.template > /root/config.ini
+envsubst < /root/ibc/config.ini.template > /root/ibc/config.ini
 
-exec "$@"
+if [ $@ = "gateway" ]; then
+    exec /opt/ibc/gatewaystart.sh
+
+    # TODO: wait
+
+else
+    exec "$@"
+fi

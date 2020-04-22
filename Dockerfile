@@ -22,9 +22,10 @@ RUN apt-get update && apt-get install -y unzip wget \
     && apt-get remove -y --purge unzip wget \
     && apt-get autoremove -y \
     && rm -rf /var/lib/apt/lists/*
-COPY config.ini /root/config.ini.template
+COPY config.ini /root/ibc/config.ini.template
+RUN mkdir /root/ibc/logs
 
 COPY --from=0 /usr/bin/envsubst /usr/bin/envsubst
 COPY entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]
-CMD ["/opt/ibc/gatewaystart.sh"]
+CMD ["gateway"]
