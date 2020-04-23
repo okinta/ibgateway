@@ -6,7 +6,7 @@ Runs Interactive Brokers (IB) gateway.
 
 To build the container:
 
-    docker build -t okinta/stack-ibgateway .
+    docker build -t okinta/ibgateway .
 
 ## Running
 
@@ -19,6 +19,6 @@ If `MODE` is not set, it will default to `paper`. `MODE` must be set to either
 `live` or `paper`. `paper` indicates IB paper trading mode, and `live`
 indicates trading with real money.
 
-    docker run -e "LOGIN=[login]" -e "PASSWORD=[password]" -e MODE=paper -p 7000:7000 okinta/stack-ibgateway
+    docker run -e "LOGIN=[login]" -e "PASSWORD=[password]" -e MODE=paper -p 7000:7000 okinta/ibgateway
 
 After the container has started, the IB API will be available via port 7000.
