@@ -14,38 +14,37 @@ RUN apt-get install --no-install-recommends -y gettext-base \
     && cp /usr/bin/envsubst /deps/usr/bin
 
 # Install tini just for some extra safety in case there are any zombies
-ARG TINI_VERSION=0.19.0
-RUN wget -q https://github.com/krallin/tini/releases/download/v$TINI_VERSION/tini-amd64 \
-    && chmod o+x tini-amd64 \
-    && mkdir -p /deps/usr/local/bin \
-    && mv tini-amd64 /deps/usr/local/bin/tini
+RUN mkdir -p /deps/usr/local/bin \
+    7& wget -q -O /deps/usr/local/bin/tini https://s3.okinta.ge/tini-amd64-0.19.0 \
+    && chmod o+x /deps/usr/local/bin/tini
 
 # Install IBC
-ARG IBC_VERSION=3.8.2
-RUN wget -q https://github.com/IbcAlpha/IBC/releases/download/$IBC_VERSION/IBCLinux-$IBC_VERSION.zip \
+RUN wget -q -O IBCLinux.zip https://s3.okinta.ge/IBCLinux-3.8.2.zip \
     && mkdir -p /deps/opt \
-    && unzip IBCLinux-$IBC_VERSION.zip -d /deps/opt/ibc \
+    && unzip IBCLinux.zip -d /deps/opt/ibc \
+    && rm -f IBCLinux.zip \
     && chmod o+x /deps/opt/ibc/*.sh /deps/opt/ibc/*/*.sh
 
 # Grab wait-for-it script so we know when gateway is ready
-ARG WAIT_FOR_IT_VERSION=c096cface5fbd9f2d6b037391dfecae6fde1362e
-RUN wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/$WAIT_FOR_IT_VERSION/wait-for-it.sh \
-    && chmod o+x wait-for-it.sh \
+RUN wget -q -O wait-for-it.zip \
+        https://s3.okinta.ge/wait-for-it-c096cface5fbd9f2d6b037391dfecae6fde1362e.zip \
+    && unzip wait-for-it.zip \
+    && rm -f wait-for-it.zip \
     && mkdir -p /deps/usr/local/bin \
-    && mv wait-for-it.sh /deps/usr/local/bin/wait-for-it
-
-# Install curl so we can download dependencies that we don't add here
-COPY --from=okinta/curl-static:ubuntu /curl /deps
+    && mv wait-for-it-master/wait-for-it.sh /deps/usr/local/bin/wait-for-it \
+    && chmod o+x /deps/usr/local/bin/wait-for-it
 
 FROM ubuntu:$UBUNTU_VERSION
 
 # Install dependencies
 RUN apt-get update \
     && apt-get install --no-install-recommends -y \
+    ca-certificates \
     libxi6 \
     libxrender1 \
     libxtst6 \
     socat \
+    wget \
     xvfb \
     && rm -rf /var/lib/apt/lists/*
 
@@ -56,10 +55,12 @@ RUN useradd --create-home ibgateway
 COPY --from=0 /deps /
 
 # Install IB Gateway
-RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/stable-standalone/ibgateway-stable-standalone-linux-x64.sh \
-    && chmod o+x ibgateway-stable-standalone-linux-x64.sh \
-    && su ibgateway -c 'yes n | ./ibgateway-stable-standalone-linux-x64.sh' \
-    && rm -f ibgateway-stable-standalone-linux-x64.sh
+RUN set -x \
+    && wget -q -O install-ibgateway.sh \
+        https://s3.okinta.ge/ibgateway-972-standalone-linux-x64.sh \
+    && chmod o+x install-ibgateway.sh \
+    && su ibgateway -c 'yes n | ./install-ibgateway.sh' \
+    && rm -f install-ibgateway.sh
 
 EXPOSE 7000
 USER ibgateway
