@@ -27,6 +27,13 @@ RUN wget -q https://github.com/IbcAlpha/IBC/releases/download/$IBC_VERSION/IBCLi
     && unzip IBCLinux-$IBC_VERSION.zip -d /deps/opt/ibc \
     && chmod o+x /deps/opt/ibc/*.sh /deps/opt/ibc/*/*.sh
 
+# Grab wait-for-it script so we know when gateway is ready
+ARG WAIT_FOR_IT_VERSION=c096cface5fbd9f2d6b037391dfecae6fde1362e
+RUN wget -q https://raw.githubusercontent.com/vishnubob/wait-for-it/$WAIT_FOR_IT_VERSION/wait-for-it.sh \
+    && chmod o+x wait-for-it.sh \
+    && mkdir -p /deps/usr/local/bin \
+    && mv wait-for-it.sh /deps/usr/local/bin/wait-for-it
+
 # Install curl so we can download dependencies that we don't add here
 COPY --from=okinta/curl-static:ubuntu /curl /deps
 
@@ -38,6 +45,7 @@ RUN apt-get update \
     libxi6 \
     libxrender1 \
     libxtst6 \
+    socat \
     xvfb \
     && rm -rf /var/lib/apt/lists/*
 
@@ -53,6 +61,7 @@ RUN curl -s -O https://download2.interactivebrokers.com/installers/ibgateway/sta
     && su ibgateway -c 'yes n | ./ibgateway-stable-standalone-linux-x64.sh' \
     && rm -f ibgateway-stable-standalone-linux-x64.sh
 
+EXPOSE 7000
 USER ibgateway
 COPY files /
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/entrypoint.sh"]

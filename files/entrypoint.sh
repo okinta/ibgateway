@@ -27,6 +27,7 @@ Xvfb :99 -screen 0 640x480x8 -nolisten tcp -nolisten unix &
 export DISPLAY=:99
 
 if [ "$1" = "gateway" ]; then
+    /port-forwarding.sh &
     exec /opt/ibc/gatewaystart.sh -inline
 
 else
