@@ -66,6 +66,5 @@ COPY files /
 RUN chown -R ibgateway:ibgateway /home/ibgateway
 
 EXPOSE 7000
-USER ibgateway
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/entrypoint.sh"]
 CMD ["gateway"]
