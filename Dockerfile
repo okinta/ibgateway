@@ -62,8 +62,10 @@ RUN set -x \
     && su ibgateway -c 'yes n | ./install-ibgateway.sh' \
     && rm -f install-ibgateway.sh
 
+COPY files /
+RUN chown -R ibgateway:ibgateway /home/ibgateway
+
 EXPOSE 7000
 USER ibgateway
-COPY files /
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/entrypoint.sh"]
 CMD ["gateway"]
