@@ -20,7 +20,7 @@ if [[ ! "$MODE" =~ ^(live|paper)$ ]]; then
     exit 1
 fi
 
-envsubst < ~/ibc/config.ini.template > ~/ibc/config.ini
+su ibgateway -c 'envsubst < ~/ibc/config.ini.template > ~/ibc/config.ini'
 
 # Start Xvfb daemon so IB Gateway has somewhere to display itself
 Xvfb :99 -screen 0 640x480x8 -nolisten tcp -nolisten unix &
@@ -28,7 +28,7 @@ export DISPLAY=:99
 
 if [ "$1" = "gateway" ]; then
     /port-forwarding.sh &
-    exec su ibgateway -c /opt/ibc/gatewaystart.sh -inline
+    exec su ibgateway -c '/opt/ibc/gatewaystart.sh -inline'
 
 else
     exec "$@"

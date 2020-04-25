@@ -1,5 +1,4 @@
-ARG UBUNTU_VERSION=18.04
-FROM ubuntu:$UBUNTU_VERSION
+FROM ubuntu:18.04 as base
 
 # Install tools to install other tools
 RUN apt-get update \
@@ -34,7 +33,7 @@ RUN wget -q -O wait-for-it.zip \
     && mv wait-for-it-master/wait-for-it.sh /deps/usr/local/bin/wait-for-it \
     && chmod o+x /deps/usr/local/bin/wait-for-it
 
-FROM ubuntu:$UBUNTU_VERSION
+FROM base
 
 # Install dependencies
 RUN apt-get update \
