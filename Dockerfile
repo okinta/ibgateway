@@ -63,7 +63,8 @@ RUN set -x \
     && rm -f install-ibgateway.sh
 
 COPY files /
-RUN chown -R ibgateway:ibgateway /home/ibgateway
+RUN chown -R ibgateway:ibgateway /home/ibgateway \
+    && chmod o+x /*.sh /opt/ibc/scripts/*.sh
 
 EXPOSE 7000
 ENTRYPOINT ["/usr/local/bin/tini", "--", "/entrypoint.sh"]
