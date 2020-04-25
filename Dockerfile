@@ -15,7 +15,7 @@ RUN apt-get install --no-install-recommends -y gettext-base \
 
 # Install tini just for some extra safety in case there are any zombies
 RUN mkdir -p /deps/usr/local/bin \
-    7& wget -q -O /deps/usr/local/bin/tini https://s3.okinta.ge/tini-amd64-0.19.0 \
+    && wget -q -O /deps/usr/local/bin/tini https://s3.okinta.ge/tini-amd64-0.19.0 \
     && chmod o+x /deps/usr/local/bin/tini
 
 # Install IBC
