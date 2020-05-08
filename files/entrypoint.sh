@@ -28,7 +28,7 @@ export DISPLAY=:99
 
 if [ "$1" = "gateway" ]; then
     /port-forwarding.sh &
-    exec su ibgateway -c '/opt/ibc/gatewaystart.sh -inline'
+    su-exec ibgateway /opt/ibc/gatewaystart.sh -inline
 
 else
     exec "$@"

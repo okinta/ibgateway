@@ -1,4 +1,5 @@
-FROM ubuntu:18.04 as base
+ARG UBUNTU_VERSION=18.04
+FROM ubuntu:$UBUNTU_VERSION
 
 # Install tools to install other tools
 RUN apt-get update \
@@ -33,7 +34,19 @@ RUN wget -q -O wait-for-it.zip \
     && mv wait-for-it-master/wait-for-it.sh /deps/usr/local/bin/wait-for-it \
     && chmod o+x /deps/usr/local/bin/wait-for-it
 
-FROM base
+# Build su-exec so we can switch users easily
+ARG SU_EXEC_VERSION=212b75144bbc06722fbd7661f651390dc47a43d1
+RUN apt-get install --no-install-recommends -y build-essential \
+    && wget -q -O su-exec.zip \
+        https://s3.okinta.ge/su-exec-$SU_EXEC_VERSION.zip \
+    && unzip su-exec.zip \
+    && rm -f su-exec.zip \
+    && cd su-exec-$SU_EXEC_VERSION \
+    && make \
+    && cp su-exec /deps/usr/local/bin \
+    && chmod o+x /deps/usr/local/bin/su-exec
+
+FROM ubuntu:$UBUNTU_VERSION
 
 # Install dependencies
 RUN apt-get update \
