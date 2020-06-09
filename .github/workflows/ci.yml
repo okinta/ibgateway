@@ -1,0 +1,40 @@
+name: Build and publish
+
+on:
+  - push
+  - pull_request
+
+jobs:
+  test-build-image:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Build image
+        run: buildah bud -t okinta/ibgateway .
+
+  publish:
+    needs:
+      - test-build-image
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: docker/build-push-action@v1
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          repository: okinta/ibgateway
+          tags: latest
+
+  build-stack:
+    needs:
+      - publish
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Publish stack
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.REPO_ACCESS_TOKEN }}
+          repository: okinta/stack-ibgateway
+          event-type: ibgateway-published
