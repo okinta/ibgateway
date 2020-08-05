@@ -19,7 +19,7 @@ RUN mkdir -p /deps/usr/local/bin \
     && chmod o+x /deps/usr/local/bin/tini
 
 # Install IBC
-RUN wget -q -O IBCLinux.zip https://s3.okinta.ge/IBCLinux-3.8.2.zip \
+RUN wget -q -O IBCLinux.zip https://s3.okinta.ge/IBCLinux-3.8.3.zip \
     && mkdir -p /deps/opt \
     && unzip IBCLinux.zip -d /deps/opt/ibc \
     && rm -f IBCLinux.zip \
@@ -69,7 +69,7 @@ COPY --from=0 /deps /
 # Install IB Gateway
 RUN set -x \
     && wget -q -O install-ibgateway.sh \
-        https://s3.okinta.ge/ibgateway-972-standalone-linux-x64.sh \
+        https://s3.okinta.ge/ibgateway-978.2e-standalone-linux-x64.sh \
     && chmod o+x install-ibgateway.sh \
     && su ibgateway -c 'yes n | ./install-ibgateway.sh' \
     && rm -f install-ibgateway.sh
